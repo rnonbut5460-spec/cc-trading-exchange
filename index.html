@@ -168,6 +168,40 @@ function simulateTrade() {
   );
 }
 
+function simulateSell() {
+  const coinInput = document.getElementById('tradecoin');
+  const amountInput = document.getElementById('tradeamount');
+
+  if (!coinInput || !amountInput) {
+    return toast('Trade form not found.');
+  }
+
+  const symbol = coinInput.value;
+  const amount = Number(amountInput.value);
+  const coin = coins.find(c => c.symbol === symbol);
+
+  if (!coin || !Number.isFinite(coin.price) || coin.price <= 0) {
+    return toast('Invalid asset price.');
+  }
+
+  if (!Number.isFinite(amount) || amount < 1) {
+    return toast('Enter an amount of at least $1.');
+  }
+
+  const owned = Number(state.assets[symbol]) || 0;
+  const quantityToSell = amount / coin.price;
+
+  if (quantityToSell > owned) {
+    return toast('Not enough of this asset to sell.');
+  }
+
+  state.assets[symbol] = owned - quantityToSell;
+  state.balance += amount;
+
+  render();
+  toast(`Sold ${symbol} for $${amount.toFixed(2)} in paper trading.`);
+}
+
 function startBot(name){if(state.bots.includes(name))return toast('This demo bot is already active.');state.bots.push(name);render();toast(name+' started in demo mode.')}
 function stopBot(i){state.bots.splice(i,1);render();toast('Demo bot stopped.')}
 function openPosition(side){const size=Number(document.getElementById('futuresize').value),lev=document.getElementById('leverage').value;if(!size||size<1)return toast('Enter a valid position size.');state.positions.push({side,size,leverage:lev});render();toast(side+' demo position opened.')}
