@@ -67,18 +67,14 @@ function getPortfolio() {
   };
 }
 function toast(msg){
-  const assetsValue = holdings.reduce(
-    (sum, item) => sum + item.value,
-    0
-  );
+  document.getElementById('toastroot').innerHTML =
+    `<div class="toast">${msg}</div>`;
 
-  return {
-    holdings: holdings,
-    assetsValue: assetsValue,
-    totalValue: (Number(state.balance) || 0) + assetsValue
-  };
+  setTimeout(() => {
+    document.getElementById('toastroot').innerHTML = '';
+  }, 2600);
 }
-document.getElementById('toastroot').innerHTML=`<div class="toast">${msg}</div>`;setTimeout(()=>document.getElementById('toastroot').innerHTML='',2600)}
+
 function setPage(p){state.page=p;document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===p));render()}
 document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>setPage(b.dataset.page)));
 function marketRows(){
