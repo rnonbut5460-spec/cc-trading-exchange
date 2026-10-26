@@ -42,7 +42,7 @@ const coins=[
 { symbol: 'TSLA', name: 'Tesla Inc.', icon: '🚗', price: 215.80, type: 'stock' },
 { symbol: 'NVDA', name: 'NVIDIA Corp.', icon: '🟢', price: 138.20, type: 'stock' },
 ];
-let state={page:'home',balance:1000,assets:{BTC:0.006,ETH:0.08,USDT:420},bots:[],positions:[],kyc:'NOT VERIFIED'};
+let state={page:'home',balance:100000,assets:{BTC:0.006,ETH:0.08,USDT:420},bots:[],positions:[],kyc:'NOT VERIFIED'};
 const fmt=n=>n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 function toast(msg){document.getElementById('toastroot').innerHTML=`<div class="toast">${msg}</div>`;setTimeout(()=>document.getElementById('toastroot').innerHTML='',2600)}
 function setPage(p){state.page=p;document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===p));render()}
