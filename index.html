@@ -44,7 +44,41 @@ const coins=[
 ];
 let state={page:'home',balance:100000,assets:{BTC:0.006,ETH:0.08,USDT:420},bots:[],positions:[],kyc:'NOT VERIFIED'};
 const fmt=n=>n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-function toast(msg){document.getElementById('toastroot').innerHTML=`<div class="toast">${msg}</div>`;setTimeout(()=>document.getElementById('toastroot').innerHTML='',2600)}
+function getPortfolio() {
+  const holdings = Object.entries(state.assets).map(([symbol, quantity]) => {
+    const coin = coins.find(c => c.symbol === symbol);
+    const price = symbol === 'USDT' ? 1 : (coin ? coin.price : 0);
+    const qty = Number(quantity) || 0;
+
+    return {
+      symbol: symbol,
+      quantity: qty,
+      price: price,
+      value: qty * price
+    };
+  });
+
+  const assetsValue = holdings.reduce((sum, item) => sum + item.value, 0);
+
+  return {
+    holdings: holdings,
+    assetsValue: assetsValue,
+    totalValue: (Number(state.balance) || 0) + assetsValue
+  };
+}
+function toast(msg){
+  const assetsValue = holdings.reduce(
+    (sum, item) => sum + item.value,
+    0
+  );
+
+  return {
+    holdings: holdings,
+    assetsValue: assetsValue,
+    totalValue: (Number(state.balance) || 0) + assetsValue
+  };
+}
+document.getElementById('toastroot').innerHTML=`<div class="toast">${msg}</div>`;setTimeout(()=>document.getElementById('toastroot').innerHTML='',2600)}
 function setPage(p){state.page=p;document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===p));render()}
 document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>setPage(b.dataset.page)));
 function marketRows(){
