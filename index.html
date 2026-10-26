@@ -91,6 +91,23 @@ function marketRows(){
   }).join('');
 }
 
+function updateDemoPrices(){
+  coins.forEach(coin => {
+    const oldPrice = Number(coin.price) || 1;
+    const movement = (Math.random() - 0.5) * 0.002;
+
+    coin.price = Math.max(
+      0.0001,
+      oldPrice * (1 + movement)
+    );
+  });
+
+  render();
+}
+
+// อัปเดตราคาจำลองทุก 5 วินาที
+setInterval(updateDemoPrices, 5000);
+
 function home(){return `<h2>Welcome back</h2><p class="sub">Your digital asset dashboard</p><div class="grid homegrid"><section class="panel"><div class="balance"><div><div class="eyebrow">Estimated total balance</div><div class="amount">$${fmt(state.balance)}</div><div class="small"><span class="positive">+$24.50 (2.51%)</span> <span>today · demo data</span></div></div><span class="pill">● Demo</span></div><div class="actions"><button class="btn" onclick="openModal('deposit')">＋ Deposit</button><button class="btn secondary" onclick="openModal('withdraw')">↗ Withdraw</button></div></section><section class="panel"><div class="eyebrow">Portfolio overview</div><div class="grid" style="margin-top:12px"><div class="stat"><span class="small">Assets</span><strong>3</strong></div><div class="stat"><span class="small">Active bots</span><strong>${state.bots.length}</strong></div><div class="stat"><span class="small">Open positions</span><strong>${state.positions.length}</strong></div><div class="stat"><span class="small">KYC status</span><strong style="font-size:13px">${state.kyc}</strong></div></div></section></div><div class="section-title"><h3>Market overview</h3><button class="link" onclick="setPage('market')">View all →</button></div><section class="panel"><table class="table"><thead><tr><th>Asset</th><th class="right">Price</th><th class="right">24h</th></tr></thead><tbody>${marketRows()}</tbody></table></section><div class="notice">Demo only: no real funds or trades are processed. Do not deposit money or upload real identity documents to this prototype.</div>`}
 function market(){return `<h2>Market</h2><p class="sub">Explore digital assets · illustrative prices</p><section class="panel"><table class="table"><thead><tr><th>Asset</th><th class="right">Price (USD)</th><th class="right">24h</th></tr></thead><tbody>${marketRows()}</tbody></table></section><section class="panel"><h3 style="margin-top:0">Quick trade simulator</h3><div class="field"><label>Asset</label><select id="tradecoin">${coins.map(c=>`<option value="${c.symbol}">${c.symbol} — ${c.name}</option>`).join('')}</select></div><div class="field"><label>Amount (USD)</label><input id="tradeamount" type="number" min="1" max="${state.balance}" value="25"></div><button class="btn full" onclick="simulateTrade()">Simulate buy</button><p class="small">This simulator does not place a real order.</p></section>`}
 
