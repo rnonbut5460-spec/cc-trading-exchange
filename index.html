@@ -128,7 +128,46 @@ function closeModal(){document.getElementById('modalroot').innerHTML=''}
 function demoDeposit(){const n=Number(document.getElementById('depositamount').value);if(!n||n<1)return toast('Enter an amount greater than zero.');state.balance+=n;closeModal();render();toast('Demo deposit added to the sample balance.')}
 function demoWithdraw(){const n=Number(document.getElementById('withdrawamount').value);if(!n||n<1||n>state.balance)return toast('Enter a valid amount within the demo balance.');state.balance-=n;closeModal();render();toast('Demo withdrawal simulated; no money was sent.')}
 function demoKyc(){state.kyc='DEMO SUBMITTED';closeModal();render();toast('Demo status updated. Identity was not verified.')}
-function simulateTrade(){const s=document.getElementById('tradecoin').value,n=Number(document.getElementById('tradeamount').value);if(!n||n<1||n>state.balance)return toast('Enter a valid amount within demo balance.');state.balance-=n;state.assets[s]=(state.assets[s]||0)+n/coins.find(c=>c.symbol===s).price;render();toast('Demo buy simulated; no real order was placed.')}
+
+function simulateTrade() {
+  const coinInput = document.getElementById('tradecoin');
+  const amountInput = document.getElementById('tradeamount');
+
+  if (!coinInput || !amountInput) {
+    return toast('Trade form not found.');
+  }
+
+  const symbol = coinInput.value;
+  const amount = Number(amountInput.value);
+  const coin = coins.find(c => c.symbol === symbol);
+
+  if (!coin || !Number.isFinite(coin.price) || coin.price <= 0) {
+    return toast('Invalid asset price.');
+  }
+
+  if (!Number.isFinite(amount) || amount < 1) {
+    return toast('Enter an amount of at least $1.');
+  }
+
+  if (!Number.isFinite(state.balance) || amount > state.balance) {
+    return toast('Insufficient demo balance.');
+  }
+
+  const quantity = amount / coin.price;
+
+  if (!Number.isFinite(quantity) || quantity <= 0) {
+    return toast('Unable to calculate purchase quantity.');
+  }
+
+  state.balance -= amount;
+  state.assets[symbol] = (state.assets[symbol] || 0) + quantity;
+
+  render();
+  toast(
+    `Bought ${symbol} with $${amount.toFixed(2)} in paper trading.`
+  );
+}
+
 function startBot(name){if(state.bots.includes(name))return toast('This demo bot is already active.');state.bots.push(name);render();toast(name+' started in demo mode.')}
 function stopBot(i){state.bots.splice(i,1);render();toast('Demo bot stopped.')}
 function openPosition(side){const size=Number(document.getElementById('futuresize').value),lev=document.getElementById('leverage').value;if(!size||size<1)return toast('Enter a valid position size.');state.positions.push({side,size,leverage:lev});render();toast(side+' demo position opened.')}
