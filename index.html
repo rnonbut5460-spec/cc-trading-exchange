@@ -792,39 +792,75 @@ function futures() {
     }
   `;
 }
-
 function assets(){
   const portfolio = getPortfolio();
+  const isLao = currentLanguage === 'lo';
 
-  return `<h2>Assets</h2>
-  <p class="sub">Your simulated wallet balances</p>
+  const t = isLao ? {
+    title: 'ຊັບສິນ',
+    subtitle: 'ຍອດເງິນໃນກະເປົາຈຳລອງຂອງທ່ານ',
+    total: 'ມູນຄ່າພອດລວມ',
+    cash: 'ຍອດເງິນຄົງເຫຼືອ',
+    assetsValue: 'ມູນຄ່າຊັບສິນ',
+    totalDesc: 'ເງິນສົດ + ມູນຄ່າຊັບສິນ',
+    paper: 'ສຳລັບ Paper Trading ເທົ່ານັ້ນ. ລາຄາຈຳລອງ, ບໍ່ໃຊ້ເງິນຈິງ.',
+    asset: 'ຊັບສິນ',
+    quantity: 'ຈຳນວນ',
+    price: 'ລາຄາ',
+    value: 'ມູນຄ່າ',
+    deposit: 'ຝາກເງິນ',
+    withdraw: 'ຖອນເງິນ',
+    kyc: 'ການຢືນຢັນຕົວຕົນ',
+    status: 'ສະຖານະ',
+    openKyc: 'ເປີດ KYC'
+  } : {
+    title: 'Assets',
+    subtitle: 'Your simulated wallet balances',
+    total: 'Total Portfolio Value',
+    cash: 'Cash Balance',
+    assetsValue: 'Total Asset Value',
+    totalDesc: 'Cash balance + value of your assets',
+    paper: 'Paper Trading only. Sample prices, no real money.',
+    asset: 'Asset',
+    quantity: 'Quantity',
+    price: 'Price',
+    value: 'Value',
+    deposit: 'Deposit',
+    withdraw: 'Withdraw',
+    kyc: 'Identity verification',
+    status: 'Status',
+    openKyc: 'Open KYC'
+  };
+
+  return `<h2>${t.title}</h2>
+  <p class="sub">${t.subtitle}</p>
 
   <section class="panel">
-    <div class="eyebrow">Total Portfolio Value</div>
+    <div class="eyebrow">${t.total}</div>
     <div class="amount">$${fmt(portfolio.totalValue)}</div>
-    <div class="small">Cash balance + value of your assets</div>
+    <div class="small">${t.totalDesc}</div>
 
     <div style="margin-top:18px">
-      <div class="eyebrow">Cash Balance</div>
+      <div class="eyebrow">${t.cash}</div>
       <div class="amount">$${fmt(state.balance)}</div>
     </div>
 
     <div style="margin-top:18px">
-      <div class="eyebrow">Total Asset Value</div>
+      <div class="eyebrow">${t.assetsValue}</div>
       <div class="amount">$${fmt(portfolio.assetsValue)}</div>
     </div>
 
-    <div class="small">Paper Trading only. Sample prices, no real money.</div>
+    <div class="small">${t.paper}</div>
   </section>
 
   <section class="panel">
     <table class="table">
       <thead>
         <tr>
-          <th>Asset</th>
-          <th class="right">Quantity</th>
-          <th class="right">Price</th>
-          <th class="right">Value</th>
+          <th>${t.asset}</th>
+          <th class="right">${t.quantity}</th>
+          <th class="right">${t.price}</th>
+          <th class="right">${t.value}</th>
         </tr>
       </thead>
       <tbody>
@@ -843,18 +879,18 @@ function assets(){
     </table>
 
     <div class="actions">
-      <button class="btn" onclick="openModal('deposit')">Deposit</button>
-      <button class="btn secondary" onclick="openModal('withdraw')">Withdraw</button>
+      <button class="btn" onclick="openModal('deposit')">${t.deposit}</button>
+      <button class="btn secondary" onclick="openModal('withdraw')">${t.withdraw}</button>
     </div>
   </section>
 
   <section class="panel">
     <div class="row">
       <div>
-        <h3 style="margin:0 0 6px">Identity verification</h3>
-        <div class="small">Status: ${state.kyc}</div>
+        <h3 style="margin:0 0 6px">${t.kyc}</h3>
+        <div class="small">${t.status}: ${state.kyc}</div>
       </div>
-      <button class="btn secondary" onclick="openModal('kyc')">Open KYC</button>
+      <button class="btn secondary" onclick="openModal('kyc')">${t.openKyc}</button>
     </div>
   </section>`;
 }
