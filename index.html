@@ -46,6 +46,9 @@ const coins=[
 let state={page:'home',balance:100000,assets:{BTC:0.006,ETH:0.08,USDT:420},bots:[],positions:[],kyc:'NOT VERIFIED'};
 let currentLanguage = localStorage.getItem('lcc_language') || 'en';
 function setLanguage(language) {
+
+let currentLanguage = localStorage.getItem('lcc_language') || 'en';
+function setLanguage(language) {
   currentLanguage = language;
   localStorage.setItem('lcc_language', language);
   render();
