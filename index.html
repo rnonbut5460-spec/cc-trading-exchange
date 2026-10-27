@@ -471,37 +471,76 @@ function market() {
   `;
 }
 
-function trade(){
+function trade() {
+  const isLao = currentLanguage === 'lo';
+
+  const t = isLao ? {
+    title: 'ຊື້ຂາຍ',
+    subtitle: 'ຄຣິບໂຕ ແລະ ຫຸ້ນສະຫະລັດ · ຊື້ຂາຍຈຳລອງ',
+    notice: 'ໂໝດທົດລອງເທົ່ານັ້ນ. ລາຄາຫຸ້ນແມ່ນລາຄາຈຳລອງ.',
+    market: 'ຕະຫຼາດ',
+    crypto: 'ຄຣິບໂຕ',
+    stocks: 'ຫຸ້ນສະຫະລັດ',
+    asset: 'ສິນຊັບ',
+    chartPrice: 'ລາຄາໃນກຣາຟ',
+    loading: 'ກຳລັງໂຫຼດກຣາຟ...',
+    order: 'ຄຳສັ່ງຊື້ຂາຍຈຳລອງ',
+    balance: 'ຍອດເງິນຈຳລອງທີ່ໃຊ້ໄດ້',
+    amount: 'ຈຳນວນເງິນ (USD)',
+    buy: 'ຊື້',
+    sell: 'ຂາຍ',
+    prices: 'ລາຄາຕະຫຼາດ',
+    price: 'ລາຄາ',
+    change: '24 ຊົ່ວໂມງ'
+  } : {
+    title: 'Trade',
+    subtitle: 'Crypto & US Stocks · Paper Trading',
+    notice: 'Demo only. Stock prices are simulated.',
+    market: 'Market',
+    crypto: 'Crypto',
+    stocks: 'US Stocks',
+    asset: 'Asset',
+    chartPrice: 'Chart price',
+    loading: 'Loading chart...',
+    order: 'Paper Order',
+    balance: 'Available demo balance',
+    amount: 'Amount (USD)',
+    buy: 'Buy',
+    sell: 'Sell',
+    prices: 'Market prices',
+    price: 'Price',
+    change: '24h'
+  };
+
   return `
-    <h2>Trade</h2>
-    <p class="sub">Crypto & US Stocks · Paper Trading</p>
+    <h2>${t.title}</h2>
+    <p class="sub">${t.subtitle}</p>
 
     <section class="panel">
-      <div class="notice">
-        Demo only. Crypto candles may use public Binance data.
-        Stock prices are simulated.
+      <div class="notice">${t.notice}</div>
+
+      <div class="field">
+        <label>${t.market}</label>
+        <select id="chartMarket" onchange="changeChartMarket()">
+          <option value="crypto">${t.crypto}</option>
+          <option value="stocks">${t.stocks}</option>
+        </select>
       </div>
 
       <div class="field">
-        <label>Market</label>
-        <select id="chartMarket" onchange="changeChartMarket()">
-          <option value="crypto">Crypto</option>
-          <option value="stocks">US Stocks</option>
+        <label>${t.asset}</label>
+        <select id="tradecoin" onchange="loadTradeChart()">
+          <option value="BTC">BTC/USDT</option>
+          <option value="ETH">ETH/USDT</option>
+          <option value="BNB">BNB/USDT</option>
+          <option value="SOL">SOL/USDT</option>
+          <option value="XRP">XRP/USDT</option>
         </select>
       </div>
-<div class="field">
-  <label>Asset</label>
-  <select id="tradecoin" onchange="loadTradeChart()">
-    <option value="BTC">BTC/USDT</option>
-    <option value="ETH">ETH/USDT</option>
-    <option value="BNB">BNB/USDT</option>
-    <option value="SOL">SOL/USDT</option>
-    <option value="XRP">XRP/USDT</option>
-  </select>
-</div>
+
       <div class="row">
         <div>
-          <div class="eyebrow">Chart price</div>
+          <div class="eyebrow">${t.chartPrice}</div>
           <strong id="chartPrice">$--</strong>
         </div>
         <span class="pill">1H</span>
@@ -511,48 +550,47 @@ function trade(){
         style="height:340px;width:100%;margin-top:18px">
       </div>
 
-      <div id="chartMessage" class="small">
-        Loading chart...
-      </div>
+      <div id="chartMessage" class="small">${t.loading}</div>
     </section>
 
     <section class="panel">
-      <h3>Paper Order</h3>
+      <h3>${t.order}</h3>
       <div class="stat">
-        <span class="small">Available demo balance</span>
+        <span class="small">${t.balance}</span>
         <strong>$${fmt(state.balance)}</strong>
       </div>
 
       <div class="field">
-        <label>Amount (USD)</label>
+        <label>${t.amount}</label>
         <input id="tradeamount" type="number"
           min="1" value="100" inputmode="decimal">
       </div>
 
       <div class="actions">
         <button class="btn full" onclick="simulateTrade()">
-          Buy
+          ${t.buy}
         </button>
         <button class="btn danger full" onclick="simulateSell()">
-          Sell
+          ${t.sell}
         </button>
       </div>
     </section>
 
     <section class="panel">
-      <h3>Market prices</h3>
+      <h3>${t.prices}</h3>
       <table class="table">
         <thead>
           <tr>
-            <th>Asset</th>
-            <th class="right">Price</th>
-            <th class="right">24h</th>
+            <th>${t.asset}</th>
+            <th class="right">${t.price}</th>
+            <th class="right">${t.change}</th>
           </tr>
         </thead>
         <tbody>${marketRows()}</tbody>
       </table>
     </section>`;
 }
+
 function bots(){return `<h2>Trading Bots</h2><p class="sub">Automated strategy dashboard · demo mode</p><div class="notice">Displayed APY figures are examples only, not guaranteed or forecast returns. No bot is connected to a real exchange.</div><div class="section-title"><h3>Strategy templates</h3></div>${[['Grid Bot','Range-based simulated strategy','8.4%'],['DCA Bot','Recurring purchase simulator','5.2%'],['Trend Bot','Trend-following simulation','11.8%']].map((b,i)=>`<div class="bot"><div class="row"><div><h4>${b[0]}</h4><div class="small">${b[1]}</div></div><span class="pill warn">DEMO</span></div><div class="row" style="margin:15px 0"><div><div class="eyebrow">Example APY</div><div class="apy">${b[2]}</div></div><button class="btn" onclick="startBot('${b[0]}')">Start demo</button></div></div>`).join('')}<div class="section-title"><h3>Your active demo bots</h3></div>${state.bots.length?state.bots.map((b,i)=>`<div class="bot row"><div><h4>${b}</h4><div class="small">Running locally · simulation only</div></div><button class="btn danger" onclick="stopBot(${i})">Stop</button></div>`).join(''):'<div class="panel small">No active bots yet. Start a demo strategy above.'}</div>`}
 function futures(){return `<h2>Futures</h2><p class="sub">Practice trading interface</p><div class="notice">Leveraged trading is high risk. This page is a practice simulator only and does not submit real orders.</div><section class="panel"><div class="row"><div><div class="eyebrow">Contract</div><h3 style="margin:6px 0">BTC/USDT Perpetual</h3></div><span class="pill">SIMULATOR</span></div><div class="stat" style="margin:14px 0"><div class="eyebrow">Reference price</div><strong>$${fmt(coins[0].price)}</strong><div class="small">Illustrative market data</div></div><div class="field"><label>Position size (USD)</label><input id="futuresize" type="number" min="1" value="50"></div><div class="field"><label>Leverage (simulation only)</label><select id="leverage"><option>1x</option><option>2x</option><option>5x</option><option>10x</option></select></div><div class="actions"><button class="btn full" onclick="openPosition('LONG')"> Long </button><button class="btn danger full" onclick="openPosition('SHORT')">Short </button></div></section><div class="section-title"><h3>Open demo positions</h3></div>${state.positions.length?state.positions.map((p,i)=>`<div class="bot row"><div><h4 class="${p.side==='LONG'?'positive':'negative'}">${p.side} · BTC/USDT</h4><div class="small">$${fmt(p.size)} notional · ${p.leverage}</div></div><button class="btn secondary" onclick="closePosition(${i})">Close</button></div>`).join(''):'<div class="panel small">No open demo positions.</div>'}`}
 
