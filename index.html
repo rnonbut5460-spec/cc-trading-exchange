@@ -687,7 +687,111 @@ function bots() {
   `;
 }
 
-function futures(){return `<h2>Futures</h2><p class="sub">Practice trading interface</p><div class="notice">Leveraged trading is high risk. This page is a practice simulator only and does not submit real orders.</div><section class="panel"><div class="row"><div><div class="eyebrow">Contract</div><h3 style="margin:6px 0">BTC/USDT Perpetual</h3></div><span class="pill">SIMULATOR</span></div><div class="stat" style="margin:14px 0"><div class="eyebrow">Reference price</div><strong>$${fmt(coins[0].price)}</strong><div class="small">Illustrative market data</div></div><div class="field"><label>Position size (USD)</label><input id="futuresize" type="number" min="1" value="50"></div><div class="field"><label>Leverage (simulation only)</label><select id="leverage"><option>1x</option><option>2x</option><option>5x</option><option>10x</option></select></div><div class="actions"><button class="btn full" onclick="openPosition('LONG')"> Long </button><button class="btn danger full" onclick="openPosition('SHORT')">Short </button></div></section><div class="section-title"><h3>Open demo positions</h3></div>${state.positions.length?state.positions.map((p,i)=>`<div class="bot row"><div><h4 class="${p.side==='LONG'?'positive':'negative'}">${p.side} · BTC/USDT</h4><div class="small">$${fmt(p.size)} notional · ${p.leverage}</div></div><button class="btn secondary" onclick="closePosition(${i})">Close</button></div>`).join(''):'<div class="panel small">No open demo positions.</div>'}`}
+function futures() {
+  const isLao = currentLanguage === 'lo';
+
+  const t = isLao ? {
+    title: 'ຟິວເຈີສ',
+    subtitle: 'ໜ້າຝຶກຊ້ອມການຊື້ຂາຍ',
+    notice: 'ການຊື້ຂາຍແບບໃຊ້ Leverage ມີຄວາມສ່ຽງສູງ. ໜ້ານີ້ເປັນລະບົບຈຳລອງເທົ່ານັ້ນ ແລະບໍ່ສົ່ງຄຳສັ່ງຊື້ຂາຍຈິງ.',
+    contract: 'ສັນຍາ',
+    simulator: 'ລະບົບຈຳລອງ',
+    reference: 'ລາຄາອ້າງອີງ',
+    illustrative: 'ຂໍ້ມູນລາຄາຕົວຢ່າງ',
+    size: 'ມູນຄ່າສະຖານະ (USD)',
+    leverage: 'Leverage (ຈຳລອງເທົ່ານັ້ນ)',
+    long: 'Long · ເປີດຊື້',
+    short: 'Short · ເປີດຂາຍ',
+    positions: 'ສະຖານະຈຳລອງທີ່ເປີດຢູ່',
+    notional: 'ມູນຄ່າສະຖານະ',
+    close: 'ປິດສະຖານະ',
+    empty: 'ບໍ່ມີສະຖານະຈຳລອງທີ່ເປີດຢູ່'
+  } : {
+    title: 'Futures',
+    subtitle: 'Practice trading interface',
+    notice: 'Leveraged trading is high risk. This page is a practice simulator only and does not submit real orders.',
+    contract: 'Contract',
+    simulator: 'SIMULATOR',
+    reference: 'Reference price',
+    illustrative: 'Illustrative market data',
+    size: 'Position size (USD)',
+    leverage: 'Leverage (simulation only)',
+    long: 'Long',
+    short: 'Short',
+    positions: 'Open demo positions',
+    notional: 'Notional',
+    close: 'Close',
+    empty: 'No open demo positions.'
+  };
+
+  return `
+    <h2>${t.title}</h2>
+    <p class="sub">${t.subtitle}</p>
+
+    <div class="notice">${t.notice}</div>
+
+    <section class="panel">
+      <div class="row">
+        <div>
+          <div class="eyebrow">${t.contract}</div>
+          <h3 style="margin:6px 0">BTC/USDT Perpetual</h3>
+        </div>
+        <span class="pill">${t.simulator}</span>
+      </div>
+
+      <div class="stat" style="margin:14px 0">
+        <div class="eyebrow">${t.reference}</div>
+        <strong>$${fmt(coins[0].price)}</strong>
+        <div class="small">${t.illustrative}</div>
+      </div>
+
+      <div class="field">
+        <label>${t.size}</label>
+        <input id="futuresize" type="number"
+          min="1" value="50" inputmode="decimal">
+      </div>
+
+      <div class="field">
+        <label>${t.leverage}</label>
+        <select id="leverage">
+          <option>1x</option>
+          <option>2x</option>
+          <option>5x</option>
+          <option>10x</option>
+        </select>
+      </div>
+
+      <div class="actions">
+        <button class="btn full"
+          onclick="openPosition('LONG')">${t.long}</button>
+        <button class="btn danger full"
+          onclick="openPosition('SHORT')">${t.short}</button>
+      </div>
+    </section>
+
+    <div class="section-title">
+      <h3>${t.positions}</h3>
+    </div>
+
+    ${state.positions.length
+      ? state.positions.map((p, i) => `
+        <div class="bot row">
+          <div>
+            <h4 class="${p.side === 'LONG' ? 'positive' : 'negative'}">
+              ${p.side} · BTC/USDT
+            </h4>
+            <div class="small">
+              ${t.notional}: $${fmt(p.size)} · ${p.leverage}
+            </div>
+          </div>
+          <button class="btn secondary"
+            onclick="closePosition(${i})">${t.close}</button>
+        </div>
+      `).join('')
+      : `<div class="panel small">${t.empty}</div>`
+    }
+  `;
+}
 
 function assets(){
   const portfolio = getPortfolio();
