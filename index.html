@@ -235,6 +235,12 @@ function home() {
         color: #eef4ff;
         border: 1px solid #34445d;
       }
+      .lcc-add-funds {
+        background: #153e36;
+        color: #45e0c1;
+        border: 1px solid #267b68;
+      }
+
       .lcc-section-title {
         font-size: 18px;
         margin: 24px 0 12px;
@@ -299,6 +305,16 @@ function home() {
           <div class="lcc-muted">Paper Trading Balance</div>
           <strong>${fmtMoney(money)}</strong>
           <div class="lcc-tag">Virtual USD · No real funds</div>
+          
+<button
+  type="button"
+  class="lcc-btn lcc-add-funds"
+  onclick="addDemoFunds()"
+  style="margin-top:14px;width:100%;"
+>
+  + Add Funds $10,000
+</button>
+
         </div>
 
         <div class="lcc-actions">
