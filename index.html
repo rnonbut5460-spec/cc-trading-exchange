@@ -130,17 +130,16 @@ function trade(){
           <option value="stocks">US Stocks</option>
         </select>
       </div>
-
-      <div class="field">
-        <label>Asset</label>
-        <select id="chartAsset" onchange="loadTradeChart()">
-          <option value="BTCUSDT">BTC/USDT</option>
-          <option value="ETHUSDT">ETH/USDT</option>
-          <option value="BNBUSDT">BNB/USDT</option>
-          <option value="SOLUSDT">SOL/USDT</option>
-        </select>
-      </div>
-
+<div class="field">
+  <label>Asset</label>
+  <select id="tradecoin" onchange="loadTradeChart()">
+    <option value="BTC">BTC/USDT</option>
+    <option value="ETH">ETH/USDT</option>
+    <option value="BNB">BNB/USDT</option>
+    <option value="SOL">SOL/USDT</option>
+    <option value="XRP">XRP/USDT</option>
+  </select>
+</div>
       <div class="row">
         <div>
           <div class="eyebrow">Chart price</div>
@@ -263,7 +262,21 @@ function assets(){
     </div>
   </section>`;
 }
-function render(){const v=document.getElementById('view');v.innerHTML=({home,market,trade,bots,futures,assets}[state.page]||home)()}render();
+function render() {
+  const v = document.getElementById('view');
+  v.innerHTML = (
+    {home, market, trade, bots, futures, assets}[state.page] || home
+  )();
+
+  if (state.page === 'trade') {
+    setTimeout(() => {
+      loadTradeChart();
+    }, 100);
+  }
+}
+
+render();
+
 function openModal(type){let content='';
 if(type==='deposit')content=`<h3>Deposit funds</h3><p class="sub">Demo deposit — no real transfer will occur.</p><div class="field"><label>Method</label><select id="depositmethod"><option>Bank transfer (demo)</option><option>LAO QR (demo)</option><option>USDT wallet (demo)</option></select></div><div class="field"><label>Amount (USD)</label><input id="depositamount" type="number" min="1" value="100"></div><div class="notice">No bank account or payment gateway is connected. Never transfer money using this prototype.</div><button class="btn full" onclick="demoDeposit()">Simulate deposit</button>`;
 if(type==='withdraw')content=`<h3>Withdraw funds</h3><p class="sub">Demo withdrawal — no real transfer will occur.</p><div class="field"><label>Amount (USD)</label><input id="withdrawamount" type="number" min="1" value="50"></div><div class="field"><label>Destination (placeholder)</label><input placeholder="Bank account / wallet address"></div><div class="notice">This form does not send money. Real withdrawals require a secure backend and authorized provider.</div><button class="btn full" onclick="demoWithdraw()">Simulate withdrawal</button>`;
@@ -348,7 +361,189 @@ function simulateSell() {
 }
 
 function startBot(name){if(state.bots.includes(name))return toast('This demo bot is already active.');state.bots.push(name);render();toast(name+' started in demo mode.')}
+let tradeChartInstance = null;
+async function loadTradeChart() {
+  const container = document.getElementById('tradeChart');
+  const assetInput = document.getElementById('tradecoin');
+  const marketInput = document.getElementById('chartMarket');
+  const message = document.getElementById('chartMessage');
+  const priceLabel = document.getElementById('chartPrice');
+
+  if (!container || !assetInput || !marketInput) return;
+
+  if (typeof LightweightCharts === 'undefined') {
+    if (message) {
+      message.textContent = 'Chart library unavailable. Check your internet connection.';
+    }
+    return;
+  }
+
+  const symbol = assetInput.value;
+  const isCrypto = marketInput.value === 'crypto';
+  const coin = coins.find(c => c.symbol === symbol);
+
+  if (!coin) {
+    if (message) message.textContent = 'Asset not found.';
+    return;
+  }
+
+  if (tradeChartInstance) {
+    tradeChartInstance.remove();
+    tradeChartInstance = null;
+  }
+
+  container.innerHTML = '';
+
+  let candles = [];
+  let source = 'Simulated demo candles';
+
+  // Try loading public 1-hour crypto candles.
+  if (isCrypto) {
+    try {
+      const response = await fetch(
+        'https://data-api.binance.vision/api/v3/klines?symbol='
+        + symbol + 'USDT&interval=1h&limit=100'
+      );
+
+      if (!response.ok) throw new Error('Data unavailable');
+
+      const rows = await response.json();
+
+      candles = rows.map(row => ({
+        time: Math.floor(Number(row[0]) / 1000),
+        open: Number(row[1]),
+        high: Number(row[2]),
+        low: Number(row[3]),
+        close: Number(row[4])
+      }));
+
+      source = 'Public Binance candle data';
+    } catch (error) {
+      candles = [];
+    }
+  }
+
+  // Use clearly labeled simulated candles if live data is unavailable,
+  // or when displaying US stocks.
+  if (candles.length === 0) {
+    let price = Number(coin.price) || 100;
+    const currentHour = Math.floor(Date.now() / 3600000) * 3600;
+
+    for (let i = 99; i >= 0; i--) {
+      const open = price;
+      const change = (Math.random() - 0.5) * 0.025;
+      const close = Math.max(0.000001, open * (1 + change));
+
+      candles.push({
+        time: currentHour - i * 3600,
+        open,
+        high: Math.max(open, close) * 1.006,
+        low: Math.min(open, close) * 0.994,
+        close
+      });
+
+      price = close;
+    }
+
+    if (isCrypto) {
+      source = 'Simulated candles; live data unavailable';
+    }
+  }
+
+  tradeChartInstance = LightweightCharts.createChart(container, {
+    width: container.clientWidth || 320,
+    height: 340,
+    layout: {
+      background: { color: '#111a2b' },
+      textColor: '#cbd5e1'
+    },
+    grid: {
+      vertLines: { color: '#26344d' },
+      horzLines: { color: '#26344d' }
+    },
+    timeScale: {
+      timeVisible: true,
+      secondsVisible: false
+    },
+    rightPriceScale: {
+      borderColor: '#26344d'
+    }
+  });
+
+  const candleSeries = tradeChartInstance.addSeries(
+    LightweightCharts.CandlestickSeries,
+    {
+      upColor: '#16c784',
+      downColor: '#ea3943',
+      borderVisible: false,
+      wickUpColor: '#16c784',
+      wickDownColor: '#ea3943'
+    }
+  );
+
+  candleSeries.setData(candles);
+  tradeChartInstance.timeScale().fitContent();
+
+  const lastCandle = candles[candles.length - 1];
+
+  if (priceLabel) {
+    priceLabel.textContent = '$' + lastCandle.close.toLocaleString(
+      'en-US',
+      { maximumFractionDigits: 6 }
+    );
+  }
+
+  if (message) {
+    message.textContent =
+      source + ' · 1-hour candles · Paper Trading only.';
+  }
+
+  // Keep the existing simulator aligned with the displayed candle price.
+  coin.price = lastCandle.close;
+}
+
+function changeChartMarket() {
+  const marketInput = document.getElementById('chartMarket');
+  const assetInput = document.getElementById('tradecoin');
+
+  if (!marketInput || !assetInput) return;
+
+  const symbols = marketInput.value === 'stocks'
+    ? ['AAPL', 'TSLA', 'NVDA']
+    : ['BTC', 'ETH', 'BNB', 'SOL', 'XRP'];
+
+  assetInput.innerHTML = symbols.map(symbol => {
+    const label = ['BTC', 'ETH', 'BNB', 'SOL', 'XRP'].includes(symbol)
+      ? symbol + '/USDT'
+      : symbol;
+
+    return `<option value="${symbol}">${label}</option>`;
+  }).join('');
+
+  loadTradeChart();
+}
+
 function stopBot(i){state.bots.splice(i,1);render();toast('Demo bot stopped.')}
+function changeChartMarket() {
+  const marketInput = document.getElementById('chartMarket');
+  const assetInput = document.getElementById('tradecoin');
+
+  if (!marketInput || !assetInput) return;
+
+  const symbols = marketInput.value === 'stocks'
+    ? ['AAPL', 'TSLA', 'NVDA']
+    : ['BTC', 'ETH', 'BNB', 'SOL', 'XRP'];
+
+  assetInput.innerHTML = symbols.map(symbol => {
+    const label = ['BTC', 'ETH', 'BNB', 'SOL', 'XRP'].includes(symbol)
+      ? symbol + '/USDT'
+      : symbol;
+
+    return `<option value="${symbol}">${label}</option>`;
+  }).join('');
+
+  loadTradeChart();
+}
 function openPosition(side){const size=Number(document.getElementById('futuresize').value),lev=document.getElementById('leverage').value;if(!size||size<1)return toast('Enter a valid position size.');state.positions.push({side,size,leverage:lev});render();toast(side+' demo position opened.')}
 function closePosition(i){state.positions.splice(i,1);render();toast('Demo position closed.')}
 render();
