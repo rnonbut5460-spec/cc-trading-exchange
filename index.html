@@ -43,8 +43,11 @@ const coins=[
 { symbol: 'TSLA', name: 'Tesla Inc.', icon: '🚗', price: 215.80, change: 0, type: 'stock' },
 { symbol: 'NVDA', name: 'NVIDIA Corp.', icon: '🟢', price: 138.20, change: 0, type: 'stock' },
 ];
+
 let state={page:'home',balance:100000,assets:{BTC:0.006,ETH:0.08,USDT:420},bots:[],positions:[],kyc:'NOT VERIFIED'};
+
 let currentLanguage = localStorage.getItem('lcc_language') || 'en';
+
 function setLanguage(language) {
   currentLanguage = language;
   localStorage.setItem('lcc_language', language);
@@ -55,14 +58,6 @@ const fmt = n => n.toLocaleString('en-US', {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2
 });
-
-let currentLanguage = localStorage.getItem('lcc_language') || 'en';
-function setLanguage(language) {
-  currentLanguage = language;
-  localStorage.setItem('lcc_language', language);
-  render();
-}
-const fmt=n=>n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 
 // โหลดทุนจำลองที่บันทึกไว้
 try {
