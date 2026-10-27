@@ -110,7 +110,215 @@ function updateDemoPrices() {
 }
 
 setInterval(updateDemoPrices, 5000);
-function home(){return `<h2>Welcome back</h2><p class="sub">Your digital asset dashboard</p><div class="grid homegrid"><section class="panel"><div class="balance"><div><div class="eyebrow">Estimated total balance</div><div class="amount">$${fmt(state.balance)}</div><div class="small"><span class="positive">+$24.50 (2.51%)</span> <span>today · demo data</span></div></div><span class="pill">● Demo</span></div><div class="actions"><button class="btn" onclick="openModal('deposit')">＋ Deposit</button><button class="btn secondary" onclick="openModal('withdraw')">↗ Withdraw</button></div></section><section class="panel"><div class="eyebrow">Portfolio overview</div><div class="grid" style="margin-top:12px"><div class="stat"><span class="small">Assets</span><strong>3</strong></div><div class="stat"><span class="small">Active bots</span><strong>${state.bots.length}</strong></div><div class="stat"><span class="small">Open positions</span><strong>${state.positions.length}</strong></div><div class="stat"><span class="small">KYC status</span><strong style="font-size:13px">${state.kyc}</strong></div></div></section></div><div class="section-title"><h3>Market overview</h3><button class="link" onclick="setPage('market')">View all →</button></div><section class="panel"><table class="table"><thead><tr><th>Asset</th><th class="right">Price</th><th class="right">24h</th></tr></thead><tbody>${marketRows()}</tbody></table></section><div class="notice">Demo only: no real funds or trades are processed. Do not deposit money or upload real identity documents to this prototype.</div>`}
+
+function home() {
+  const money = Number(state.balance) || 0;
+
+  const fmtMoney = (value) =>
+    '$' + Number(value || 0).toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+
+  const featured = ['BTC', 'ETH', 'BNB', 'SOL', 'XRP']
+    .map(symbol => coins.find(c => c.symbol === symbol))
+    .filter(Boolean);
+
+  return `
+    <style>
+      .lcc-home {
+        color: #eef4ff;
+        font-family: Arial, sans-serif;
+        padding: 16px;
+        background: #080d19;
+        border-radius: 14px;
+      }
+      .lcc-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 22px;
+      }
+      .lcc-brand {
+        font-size: 23px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        color: #45e0c1;
+      }
+      .lcc-tag {
+        color: #9aabc5;
+        font-size: 11px;
+        margin-top: 5px;
+      }
+      .lcc-hero {
+        padding: 22px 18px;
+        border: 1px solid #263750;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #14263b, #0d1525 75%);
+        margin-bottom: 18px;
+      }
+      .lcc-eyebrow {
+        color: #45e0c1;
+        font-size: 12px;
+        font-weight: bold;
+        letter-spacing: 1px;
+      }
+      .lcc-hero h2 {
+        font-size: 25px;
+        line-height: 1.3;
+        margin: 12px 0;
+      }
+      .lcc-muted {
+        color: #9aabc5;
+        font-size: 13px;
+        line-height: 1.6;
+      }
+      .lcc-balance {
+        margin-top: 22px;
+        padding: 16px;
+        border-radius: 12px;
+        background: #0a1220;
+      }
+      .lcc-balance strong {
+        display: block;
+        font-size: 28px;
+        margin-top: 8px;
+        overflow-wrap: anywhere;
+      }
+      .lcc-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 18px;
+      }
+      .lcc-btn {
+        border: 0;
+        border-radius: 9px;
+        padding: 12px 16px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+      .lcc-primary {
+        background: #45e0c1;
+        color: #07131d;
+      }
+      .lcc-secondary {
+        background: #202d42;
+        color: #eef4ff;
+        border: 1px solid #34445d;
+      }
+      .lcc-section-title {
+        font-size: 18px;
+        margin: 24px 0 12px;
+      }
+      .lcc-markets {
+        border: 1px solid #25344a;
+        border-radius: 13px;
+        overflow: hidden;
+      }
+      .lcc-market-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 12px;
+        border-bottom: 1px solid #202c40;
+      }
+      .lcc-market-row:last-child {
+        border-bottom: 0;
+      }
+      .lcc-coin-name {
+        font-weight: bold;
+        font-size: 14px;
+      }
+      .lcc-coin-sub {
+        color: #8d9db6;
+        font-size: 11px;
+        margin-top: 4px;
+      }
+      .lcc-price {
+        text-align: right;
+        font-weight: bold;
+        font-size: 14px;
+        overflow-wrap: anywhere;
+      }
+      .lcc-note {
+        color: #91a2bb;
+        font-size: 11px;
+        margin-top: 14px;
+        line-height: 1.6;
+      }
+    </style>
+
+    <div class="lcc-home">
+      <div class="lcc-top">
+        <div>
+          <div class="lcc-brand">LCC EXCHANGE</div>
+          <div class="lcc-tag">YOUR MARKET. YOUR FUTURE.</div>
+        </div>
+        <div class="lcc-tag">DEMO MODE</div>
+      </div>
+
+      <section class="lcc-hero">
+        <div class="lcc-eyebrow">WELCOME TO LCC</div>
+        <h2>Explore the market.<br>Practice your strategy.</h2>
+        <div class="lcc-muted">
+          Crypto and US stocks in one place.
+          Practice trading with virtual funds, without real-money orders.
+        </div>
+
+        <div class="lcc-balance">
+          <div class="lcc-muted">Paper Trading Balance</div>
+          <strong>${fmtMoney(money)}</strong>
+          <div class="lcc-tag">Virtual USD · No real funds</div>
+        </div>
+
+        <div class="lcc-actions">
+          <button class="lcc-btn lcc-primary"
+            onclick="state.page='trade';render()">
+            Start Trading
+          </button>
+          <button class="lcc-btn lcc-secondary"
+            onclick="state.page='market';render()">
+            Explore Markets
+          </button>
+        </div>
+      </section>
+
+      <h3 class="lcc-section-title">Popular Crypto</h3>
+
+      <div class="lcc-markets">
+        ${featured.length ? featured.map(coin => `
+          <div class="lcc-market-row">
+            <div>
+              <div class="lcc-coin-name">
+                ${coin.symbol}/USDT
+              </div>
+              <div class="lcc-coin-sub">
+                ${coin.name || coin.symbol}
+              </div>
+            </div>
+            <div class="lcc-price">
+              ${fmtMoney(coin.price)}
+            </div>
+          </div>
+        `).join('') : `
+          <div class="lcc-market-row">
+            Market data is not available.
+          </div>
+        `}
+      </div>
+
+      <div class="lcc-note">
+        Prices shown are reference values from the website's current
+        data source. Verify the price feed before trading.
+        Paper Trading only — no real-money transactions.
+      </div>
+    </div>
+  `;
+}
 function market(){return `<h2>Market</h2><p class="sub">Explore digital assets · illustrative prices</p><section class="panel"><table class="table"><thead><tr><th>Asset</th><th class="right">Price (USD)</th><th class="right">24h</th></tr></thead><tbody>${marketRows()}</tbody></table></section><section class="panel"><h3 style="margin-top:0">Quick trade simulator</h3><div class="field"><label>Asset</label><select id="tradecoin">${coins.map(c=>`<option value="${c.symbol}">${c.symbol} — ${c.name}</option>`).join('')}</select></div><div class="field"><label>Amount (USD)</label><input id="tradeamount" type="number" min="1" max="${state.balance}" value="25"></div><button class="btn full" onclick="simulateTrade()">Simulate buy</button><p class="small">This simulator does not place a real order.</p></section>`}
 
 function trade(){
