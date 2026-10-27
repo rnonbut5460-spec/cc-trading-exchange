@@ -44,7 +44,33 @@ const coins=[
 { symbol: 'NVDA', name: 'NVIDIA Corp.', icon: '🟢', price: 138.20, change: 0, type: 'stock' },
 ];
 let state={page:'home',balance:100000,assets:{BTC:0.006,ETH:0.08,USDT:420},bots:[],positions:[],kyc:'NOT VERIFIED'};
+
 const fmt=n=>n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+// โหลดทุนจำลองที่บันทึกไว้
+try {
+  const savedBalance = localStorage.getItem('lcc_demo_balance');
+  if (savedBalance !== null && Number.isFinite(Number(savedBalance))) {
+    state.balance = Number(savedBalance);
+  }
+} catch (error) {
+  console.warn('Unable to load demo balance.');
+}
+
+// ปุ่มเพิ่มทุนจำลองครั้งละ $10,000
+function addDemoFunds() {
+  const amount = 10000;
+  state.balance = (Number(state.balance) || 0) + amount;
+
+  try {
+    localStorage.setItem('lcc_demo_balance', String(state.balance));
+  } catch (error) {
+    console.warn('Unable to save demo balance.');
+  }
+
+  render();
+}
+
 function getPortfolio() {
   const holdings = Object.entries(state.assets).map(([symbol, quantity]) => {
     const coin = coins.find(c => c.symbol === symbol);
