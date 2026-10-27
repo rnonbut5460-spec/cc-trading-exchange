@@ -149,6 +149,56 @@ function updateDemoPrices() {
 
 setInterval(updateDemoPrices, 5000);
 
+function searchHomeMarkets(query) {
+  const results = document.getElementById('lcc-home-search-results');
+  if (!results) return;
+
+  const q = String(query || '').trim().toLowerCase();
+
+  if (!q) {
+    results.style.display = 'none';
+    results.innerHTML = '';
+    return;
+  }
+
+  const items = [
+    ...coins.map(c => ({
+      symbol: c.symbol,
+      name: c.name || c.symbol,
+      category: c.type === 'stock' ? 'US Stocks' : 'Crypto'
+    })),
+    { symbol: 'XAUUSD', name: 'Gold', category: 'Markets' },
+    { symbol: 'EURUSD', name: 'Euro / US Dollar', category: 'Forex' },
+    { symbol: 'GBPUSD', name: 'British Pound / US Dollar', category: 'Forex' },
+    { symbol: 'SPX', name: 'S&P 500', category: 'Indices' },
+    { symbol: 'NDX', name: 'Nasdaq 100', category: 'Indices' },
+    { symbol: 'MSFT', name: 'Microsoft', category: 'US Stocks' },
+    { symbol: 'AMZN', name: 'Amazon', category: 'US Stocks' },
+    { symbol: 'GOOGL', name: 'Alphabet', category: 'US Stocks' }
+  ];
+
+  const matches = items.filter(item =>
+    item.symbol.toLowerCase().includes(q) ||
+    item.name.toLowerCase().includes(q) ||
+    item.category.toLowerCase().includes(q)
+  );
+
+  results.style.display = 'block';
+
+  if (!matches.length) {
+    results.innerHTML = '<div style="padding:12px">No results found</div>';
+    return;
+  }
+
+  results.innerHTML = matches.map(item => `
+    <div style="padding:12px;border-bottom:1px solid var(--line)">
+      <strong>${item.symbol}</strong>
+      <span style="margin-left:8px">${item.name}</span>
+      <small style="display:block;opacity:.7">${item.category}</small>
+    </div>
+  `).join('');
+}
+
 function home() {
   const money = Number(state.balance) || 0;
 
