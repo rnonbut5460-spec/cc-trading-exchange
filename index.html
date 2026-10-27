@@ -409,7 +409,65 @@ ${homeText.start}
     </div>
   `;
 }
-function market(){return `<h2>Market</h2><p class="sub">Explore digital assets · illustrative prices</p><section class="panel"><table class="table"><thead><tr><th>Asset</th><th class="right">Price (USD)</th><th class="right">24h</th></tr></thead><tbody>${marketRows()}</tbody></table></section><section class="panel"><h3 style="margin-top:0">Quick trade simulator</h3><div class="field"><label>Asset</label><select id="tradecoin">${coins.map(c=>`<option value="${c.symbol}">${c.symbol} — ${c.name}</option>`).join('')}</select></div><div class="field"><label>Amount (USD)</label><input id="tradeamount" type="number" min="1" max="${state.balance}" value="25"></div><button class="btn full" onclick="simulateTrade()">Simulate buy</button><p class="small">This simulator does not place a real order.</p></section>`}
+
+function market() {
+  const t = isLao ? {
+    title: 'ຕະຫຼາດ',
+    subtitle: 'ສຳຫຼວດສິນຊັບດິຈິຕອນ · ລາຄາຕົວຢ່າງ',
+    asset: 'ສິນຊັບ',
+    price: 'ລາຄາ (USD)',
+    change: '24 ຊົ່ວໂມງ',
+    quickTrade: 'ຈຳລອງການຊື້ຂາຍ',
+    amount: 'ຈຳນວນເງິນ (USD)',
+    buy: 'ຈຳລອງຊື້',
+    notice: 'ລະບົບນີ້ບໍ່ໄດ້ສົ່ງຄຳສັ່ງຊື້ຂາຍຈິງ'
+  } : {
+    title: 'Market',
+    subtitle: 'Explore digital assets · illustrative prices',
+    asset: 'Asset',
+    price: 'Price (USD)',
+    change: '24h',
+    quickTrade: 'Quick trade simulator',
+    amount: 'Amount (USD)',
+    buy: 'Simulate buy',
+    notice: 'This simulator does not place a real order.'
+  };
+
+  return `
+    <h2>${t.title}</h2>
+    <p class="sub">${t.subtitle}</p>
+
+    <section class="panel">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>${t.asset}</th>
+            <th class="right">${t.price}</th>
+            <th class="right">${t.change}</th>
+          </tr>
+        </thead>
+        <tbody>${marketRows()}</tbody>
+      </table>
+    </section>
+
+    <section class="panel">
+      <h3 style="margin-top:0">${t.quickTrade}</h3>
+      <div class="field">
+        <label>${t.asset}</label>
+        <select id="tradecoin">
+          ${coins.map(c => `<option value="${c.symbol}">${c.symbol} — ${c.name}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
+        <label>${t.amount}</label>
+        <input id="tradeamount" type="number" min="1"
+          max="${state.balance}" value="25">
+      </div>
+      <button class="btn full" onclick="simulateTrade()">${t.buy}</button>
+      <p class="small">${t.notice}</p>
+    </section>
+  `;
+}
 
 function trade(){
   return `
