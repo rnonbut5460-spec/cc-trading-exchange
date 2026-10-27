@@ -445,7 +445,17 @@ ${homeText.start}
         </div>
       </section>
 
-      <h3 class="lcc-section-title">${homeText.popular}</h3>
+<div style="margin-bottom:14px;">
+  <input
+    id="lcc-home-search"
+    type="search"
+    placeholder="Search BTC, AAPL, Gold..."
+    oninput="searchHomeMarkets(this.value)"
+    style="box-sizing:border-box;width:100%;padding:14px;border-radius:10px;border:1px solid #34445d;background:#111a2b;color:#eef4ff;font-size:16px;"
+  />
+</div>
+
+<div id="lcc-home-search-results" class="lcc-markets" style="display:none;margin-bottom:16px;"></div>
 
       <div class="lcc-markets">
         ${featured.length ? featured.map(coin => `
