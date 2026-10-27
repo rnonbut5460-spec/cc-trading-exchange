@@ -365,142 +365,112 @@ function startBot(name){if(state.bots.includes(name))return toast('This demo bot
 let tradeChartInstance = null;
 async function loadTradeChart() {
   const container = document.getElementById('tradeChart');
-  const assetInput = document.getElementById('tradecoin');
   const marketInput = document.getElementById('chartMarket');
+  const assetInput = document.getElementById('tradecoin');
+  const priceDisplay = document.getElementById('chartPrice');
   const message = document.getElementById('chartMessage');
-  const priceLabel = document.getElementById('chartPrice');
 
-  if (!container || !assetInput || !marketInput) return;
+  if (!container || !marketInput || !assetInput) return;
 
-  if (typeof LightweightCharts === 'undefined') {
-    if (message) {
-      message.textContent = 'Chart library unavailable. Check your internet connection.';
-    }
-    return;
-  }
-
+  const isStock = marketInput.value === 'stocks';
   const symbol = assetInput.value;
-  const isCrypto = marketInput.value === 'crypto';
-  const coin = coins.find(c => c.symbol === symbol);
 
-  if (!coin) {
-    if (message) message.textContent = 'Asset not found.';
-    return;
-  }
+  // TradingView symbol
+  const tvSymbol = isStock
+    ? (['AAPL', 'TSLA', 'NVDA'].includes(symbol)
+        ? 'NASDAQ:' + symbol
+        : 'NASDAQ:AAPL')
+    : 'BINANCE:' + symbol + 'USDT';
 
-  if (tradeChartInstance) {
-    tradeChartInstance.remove();
-    tradeChartInstance = null;
-  }
-
+  // Show the TradingView chart
   container.innerHTML = '';
+  container.style.height = '380px';
 
-  let candles = [];
-  let source = 'Simulated demo candles';
+  const widget = document.createElement('div');
+  widget.className = 'tradingview-widget-container';
+  widget.style.height = '100%';
+  widget.style.width = '100%';
 
-  // Try loading public 1-hour crypto candles.
-  if (isCrypto) {
-    try {
-      const response = await fetch(
-        'https://data-api.binance.vision/api/v3/klines?symbol='
-        + symbol + 'USDT&interval=1h&limit=100'
-      );
+  const chart = document.createElement('div');
+  chart.className = 'tradingview-widget-container__widget';
+  chart.style.height = '100%';
+  chart.style.width = '100%';
 
-      if (!response.ok) throw new Error('Data unavailable');
+  widget.appendChild(chart);
+  container.appendChild(widget);
 
-      const rows = await response.json();
+  const script = document.createElement('script');
+  script.src =
+    'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+  script.async = true;
 
-      candles = rows.map(row => ({
-        time: Math.floor(Number(row[0]) / 1000),
-        open: Number(row[1]),
-        high: Number(row[2]),
-        low: Number(row[3]),
-        close: Number(row[4])
-      }));
-
-      source = 'Public Binance candle data';
-    } catch (error) {
-      candles = [];
-    }
-  }
-
-  // Use clearly labeled simulated candles if live data is unavailable,
-  // or when displaying US stocks.
-  if (candles.length === 0) {
-    let price = Number(coin.price) || 100;
-    const currentHour = Math.floor(Date.now() / 3600000) * 3600;
-
-    for (let i = 99; i >= 0; i--) {
-      const open = price;
-      const change = (Math.random() - 0.5) * 0.025;
-      const close = Math.max(0.000001, open * (1 + change));
-
-      candles.push({
-        time: currentHour - i * 3600,
-        open,
-        high: Math.max(open, close) * 1.006,
-        low: Math.min(open, close) * 0.994,
-        close
-      });
-
-      price = close;
-    }
-
-    if (isCrypto) {
-      source = 'Simulated candles; live data unavailable';
-    }
-  }
-
-  tradeChartInstance = LightweightCharts.createChart(container, {
-    width: container.clientWidth || 320,
-    height: 340,
-    layout: {
-      background: { color: '#111a2b' },
-      textColor: '#cbd5e1'
-    },
-    grid: {
-      vertLines: { color: '#26344d' },
-      horzLines: { color: '#26344d' }
-    },
-    timeScale: {
-      timeVisible: true,
-      secondsVisible: false
-    },
-    rightPriceScale: {
-      borderColor: '#26344d'
-    }
+  script.textContent = JSON.stringify({
+    autosize: true,
+    symbol: tvSymbol,
+    interval: '60',
+    timezone: 'Etc/UTC',
+    theme: 'dark',
+    style: '1',
+    locale: 'en',
+    allow_symbol_change: true,
+    calendar: false,
+    support_host: 'https://www.tradingview.com'
   });
 
-  const candleSeries = tradeChartInstance.addSeries(
-    LightweightCharts.CandlestickSeries,
-    {
-      upColor: '#16c784',
-      downColor: '#ea3943',
-      borderVisible: false,
-      wickUpColor: '#16c784',
-      wickDownColor: '#ea3943'
+  widget.appendChild(script);
+
+  // Connect crypto prices to Paper Trading
+  if (!isStock) {
+    try {
+      if (message) message.textContent = 'Loading market price...';
+
+      const response = await fetch(
+        'https://data-api.binance.vision/api/v3/ticker/price?symbol=' +
+        encodeURIComponent(symbol + 'USDT')
+      );
+
+      if (!response.ok) {
+        throw new Error('Price request failed');
+      }
+
+      const data = await response.json();
+      const livePrice = Number(data.price);
+
+      if (!Number.isFinite(livePrice) || livePrice <= 0) {
+        throw new Error('Invalid price');
+      }
+
+      const coin = coins.find(c => c.symbol === symbol);
+
+      if (coin) {
+        coin.price = livePrice;
+      }
+
+      if (priceDisplay) {
+        priceDisplay.textContent =
+          '$' + livePrice.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 8
+          });
+      }
+
+      if (message) {
+        message.textContent =
+          'Crypto reference price from Binance public market data';
+      }
+    } catch (error) {
+      if (message) {
+        message.textContent =
+          'Could not load crypto price. Check connection and try again.';
+      }
     }
-  );
-
-  candleSeries.setData(candles);
-  tradeChartInstance.timeScale().fitContent();
-
-  const lastCandle = candles[candles.length - 1];
-
-  if (priceLabel) {
-    priceLabel.textContent = '$' + lastCandle.close.toLocaleString(
-      'en-US',
-      { maximumFractionDigits: 6 }
-    );
+  } else {
+    if (priceDisplay) priceDisplay.textContent = '$--';
+    if (message) {
+      message.textContent =
+        'TradingView chart loaded. Stock Paper Trading price feed is not connected yet.';
+    }
   }
-
-  if (message) {
-    message.textContent =
-      source + ' · 1-hour candles · Paper Trading only.';
-  }
-
-  // Keep the existing simulator aligned with the displayed candle price.
-  coin.price = lastCandle.close;
 }
 
 function changeChartMarket() {
