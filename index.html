@@ -591,7 +591,102 @@ function trade() {
     </section>`;
 }
 
-function bots(){return `<h2>Trading Bots</h2><p class="sub">Automated strategy dashboard · demo mode</p><div class="notice">Displayed APY figures are examples only, not guaranteed or forecast returns. No bot is connected to a real exchange.</div><div class="section-title"><h3>Strategy templates</h3></div>${[['Grid Bot','Range-based simulated strategy','8.4%'],['DCA Bot','Recurring purchase simulator','5.2%'],['Trend Bot','Trend-following simulation','11.8%']].map((b,i)=>`<div class="bot"><div class="row"><div><h4>${b[0]}</h4><div class="small">${b[1]}</div></div><span class="pill warn">DEMO</span></div><div class="row" style="margin:15px 0"><div><div class="eyebrow">Example APY</div><div class="apy">${b[2]}</div></div><button class="btn" onclick="startBot('${b[0]}')">Start demo</button></div></div>`).join('')}<div class="section-title"><h3>Your active demo bots</h3></div>${state.bots.length?state.bots.map((b,i)=>`<div class="bot row"><div><h4>${b}</h4><div class="small">Running locally · simulation only</div></div><button class="btn danger" onclick="stopBot(${i})">Stop</button></div>`).join(''):'<div class="panel small">No active bots yet. Start a demo strategy above.'}</div>`}
+function bots() {
+  const isLao = currentLanguage === 'lo';
+
+  const t = isLao ? {
+    title: 'ບັອດຊື້ຂາຍ',
+    subtitle: 'ແຜງຄວບຄຸມກົນລະຍຸດອັດຕະໂນມັດ · ໂໝດຈຳລອງ',
+    notice: 'ຕົວເລກ APY ເປັນພຽງຕົວຢ່າງ ບໍ່ແມ່ນການຮັບປະກັນຜົນຕອບແທນ. ບັອດບໍ່ໄດ້ເຊື່ອມຕໍ່ກັບກະດານແລກປ່ຽນຈິງ.',
+    templates: 'ຮູບແບບກົນລະຍຸດ',
+    grid: 'Grid Bot',
+    gridDesc: 'ກົນລະຍຸດຈຳລອງຕາມຊ່ວງລາຄາ',
+    dca: 'DCA Bot',
+    dcaDesc: 'ຈຳລອງການຊື້ຊ້ຳຕາມກຳນົດເວລາ',
+    trend: 'Trend Bot',
+    trendDesc: 'ຈຳລອງການຊື້ຂາຍຕາມແນວໂນ້ມ',
+    apy: 'APY ຕົວຢ່າງ',
+    start: 'ເລີ່ມຈຳລອງ',
+    active: 'ບັອດຈຳລອງທີ່ກຳລັງໃຊ້',
+    running: 'ເຮັດວຽກພາຍໃນເວັບໄຊ · ຈຳລອງເທົ່ານັ້ນ',
+    stop: 'ຢຸດ',
+    empty: 'ຍັງບໍ່ມີບັອດທີ່ໃຊ້ງານ. ເລືອກເລີ່ມກົນລະຍຸດຈຳລອງດ້ານເທິງ.'
+  } : {
+    title: 'Trading Bots',
+    subtitle: 'Automated strategy dashboard · demo mode',
+    notice: 'APY figures are examples only, not guaranteed returns or forecasts. No bot is connected to a real exchange.',
+    templates: 'Strategy templates',
+    grid: 'Grid Bot',
+    gridDesc: 'Range-based simulated strategy',
+    dca: 'DCA Bot',
+    dcaDesc: 'Recurring purchase simulator',
+    trend: 'Trend Bot',
+    trendDesc: 'Trend-following simulation',
+    apy: 'Example APY',
+    start: 'Start demo',
+    active: 'Your active demo bots',
+    running: 'Running locally · simulation only',
+    stop: 'Stop',
+    empty: 'No active bots yet. Start a demo strategy above.'
+  };
+
+  const strategies = [
+    ['Grid Bot', t.grid, t.gridDesc, '8.4%'],
+    ['DCA Bot', t.dca, t.dcaDesc, '5.2%'],
+    ['Trend Bot', t.trend, t.trendDesc, '11.8%']
+  ];
+
+  return `
+    <h2>${t.title}</h2>
+    <p class="sub">${t.subtitle}</p>
+
+    <div class="notice">${t.notice}</div>
+
+    <div class="section-title">
+      <h3>${t.templates}</h3>
+    </div>
+
+    ${strategies.map(b => `
+      <div class="bot">
+        <div class="row">
+          <div>
+            <h4>${b[1]}</h4>
+            <div class="small">${b[2]}</div>
+          </div>
+          <span class="pill warn">DEMO</span>
+        </div>
+
+        <div class="row" style="margin:15px 0">
+          <div>
+            <div class="eyebrow">${t.apy}</div>
+            <div class="apy">${b[3]}</div>
+          </div>
+          <button class="btn"
+            onclick="startBot('${b[0]}')">${t.start}</button>
+        </div>
+      </div>
+    `).join('')}
+
+    <div class="section-title">
+      <h3>${t.active}</h3>
+    </div>
+
+    ${state.bots.length
+      ? state.bots.map((b, i) => `
+        <div class="bot row">
+          <div>
+            <h4>${b}</h4>
+            <div class="small">${t.running}</div>
+          </div>
+          <button class="btn danger"
+            onclick="stopBot(${i})">${t.stop}</button>
+        </div>
+      `).join('')
+      : `<div class="panel small">${t.empty}</div>`
+    }
+  `;
+}
+
 function futures(){return `<h2>Futures</h2><p class="sub">Practice trading interface</p><div class="notice">Leveraged trading is high risk. This page is a practice simulator only and does not submit real orders.</div><section class="panel"><div class="row"><div><div class="eyebrow">Contract</div><h3 style="margin:6px 0">BTC/USDT Perpetual</h3></div><span class="pill">SIMULATOR</span></div><div class="stat" style="margin:14px 0"><div class="eyebrow">Reference price</div><strong>$${fmt(coins[0].price)}</strong><div class="small">Illustrative market data</div></div><div class="field"><label>Position size (USD)</label><input id="futuresize" type="number" min="1" value="50"></div><div class="field"><label>Leverage (simulation only)</label><select id="leverage"><option>1x</option><option>2x</option><option>5x</option><option>10x</option></select></div><div class="actions"><button class="btn full" onclick="openPosition('LONG')"> Long </button><button class="btn danger full" onclick="openPosition('SHORT')">Short </button></div></section><div class="section-title"><h3>Open demo positions</h3></div>${state.positions.length?state.positions.map((p,i)=>`<div class="bot row"><div><h4 class="${p.side==='LONG'?'positive':'negative'}">${p.side} · BTC/USDT</h4><div class="small">$${fmt(p.size)} notional · ${p.leverage}</div></div><button class="btn secondary" onclick="closePosition(${i})">Close</button></div>`).join(''):'<div class="panel small">No open demo positions.</div>'}`}
 
 function assets(){
