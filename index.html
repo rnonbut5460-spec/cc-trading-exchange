@@ -168,18 +168,10 @@ const homeText = {
 explore: isLao ? 'ສຳຫຼວດຕະຫຼາດ' : 'Explore Markets',
   popular: isLao ? 'ຄຣິບໂຕຍອດນິຍົມ' : 'Popular Crypto'
 };
-  `const fmtMoney = (value) =>` ไปจนถึง `return \`` เท่านั้น โดยคงโค้ด CSS ที่เริ่มด้วย `.lcc-home {` และส่วน HTML ด้านล่างไว้ตามเดิม
-
-<CodeBlock language="javascript" editable>
-
 const fmtMoney = (value) =>
-
   '$' + Number(value || 0).toLocaleString('en-US', {
-
     minimumFractionDigits: 2,
-
     maximumFractionDigits: 2
-
   });
 
 const featured = ['BTC', 'ETH', 'BNB', 'SOL', 'XRP']
