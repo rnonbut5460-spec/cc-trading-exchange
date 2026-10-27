@@ -168,17 +168,93 @@ const homeText = {
 explore: isLao ? 'ສຳຫຼວດຕະຫຼາດ' : 'Explore Markets',
   popular: isLao ? 'ຄຣິບໂຕຍອດນິຍົມ' : 'Popular Crypto'
 };
-  const fmtMoney = (value) =>
-    '$' + Number(value || 0).toLocaleString('en-US', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
+  `const fmtMoney = (value) =>` ไปจนถึง `return \`` เท่านั้น โดยคงโค้ด CSS ที่เริ่มด้วย `.lcc-home {` และส่วน HTML ด้านล่างไว้ตามเดิม
 
-  const featured = ['BTC', 'ETH', 'BNB', 'SOL', 'XRP']
-    .map(symbol => coins.find(c => c.symbol === symbol))
-    .filter(Boolean);
+<CodeBlock language="javascript" editable>
 
-  return `
+const fmtMoney = (value) =>
+
+  '$' + Number(value || 0).toLocaleString('en-US', {
+
+    minimumFractionDigits: 2,
+
+    maximumFractionDigits: 2
+
+  });
+
+const featured = ['BTC', 'ETH', 'BNB', 'SOL', 'XRP']
+
+  .map(symbol => coins.find(c => c.symbol === symbol))
+
+  .filter(Boolean);
+
+const homeSearchItems = [
+
+  ...coins.map(c => ({
+
+    symbol: c.symbol,
+
+    name: c.name || c.symbol,
+
+    category: 'Crypto',
+
+    price: c.price
+
+  })),
+
+  ...[
+
+    ['AAPL', 'Apple'],
+
+    ['MSFT', 'Microsoft'],
+
+    ['NVDA', 'NVIDIA'],
+
+    ['TSLA', 'Tesla'],
+
+    ['AMZN', 'Amazon'],
+
+    ['GOOGL', 'Alphabet']
+
+  ].map(([symbol, name]) => ({
+
+    symbol,
+
+    name,
+
+    category: 'US Stocks',
+
+    price: null
+
+  })),
+
+  ...[
+
+    ['XAUUSD', 'Gold'],
+
+    ['EURUSD', 'EUR/USD'],
+
+    ['GBPUSD', 'GBP/USD'],
+
+    ['SPX', 'S&P 500'],
+
+    ['NDX', 'Nasdaq 100']
+
+  ].map(([symbol, name]) => ({
+
+    symbol,
+
+    name,
+
+    category: 'Other Markets',
+
+    price: null
+
+  }))
+
+];
+
+return `
     <style>
       .lcc-home {
         color: #eef4ff;
