@@ -198,38 +198,6 @@ function searchHomeMarkets(query) {
     </div>
   `).join('');
 }
-
-function home() {
-  const money = Number(state.balance) || 0;
-
-const isLao = currentLanguage === 'lo';
-
-const homeText = {
-  welcome: isLao ? 'ຍິນດີຕ້ອນຮັບ LCC' : 'WELCOME TO LCC',
-  headline: isLao
-    ? 'ສຳຫຼວດຕະຫຼາດ. ຝຶກຝົນກົນລະຍຸດຂອງທ່ານ.'
-    : 'Explore the market.<br>Practice your strategy.',
-  description: isLao
-    ? 'ຄຣິບໂຕ ແລະ ຫຸ້ນສະຫະລັດໃນບ່ອນດຽວ. ຝຶກຊື້ຂາຍດ້ວຍເງິນຈຳລອງ.'
-    : 'Crypto and US stocks in one place. Practice trading with virtual funds, without real-money orders.',
-  balance: isLao ? 'ຍອດເງິນຈຳລອງ' : 'Paper Trading Balance',
-  addFunds: isLao ? '+ ເພີ່ມເງິນຈຳລອງ $10,000' : '+ Add Funds $10,000',
-  start: isLao ? 'ເລີ່ມຊື້ຂາຍ' : 'Start Trading',
-explore: isLao ? 'ສຳຫຼວດຕະຫຼາດ' : 'Explore Markets',
-  popular: isLao ? 'ຄຣິບໂຕຍອດນິຍົມ' : 'Popular Crypto'
-};
-const fmtMoney = (value) =>
-  '$' + Number(value || 0).toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  });
-
-const featured = ['BTC', 'ETH', 'BNB', 'SOL', 'XRP']
-
-  .map(symbol => coins.find(c => c.symbol === symbol))
-
-  .filter(Boolean);
-
 const homeSearchItems = [
 
   ...coins.map(c => ({
@@ -295,6 +263,36 @@ const homeSearchItems = [
   }))
 
 ];
+function home() {
+  const money = Number(state.balance) || 0;
+
+const isLao = currentLanguage === 'lo';
+
+const homeText = {
+  welcome: isLao ? 'ຍິນດີຕ້ອນຮັບ LCC' : 'WELCOME TO LCC',
+  headline: isLao
+    ? 'ສຳຫຼວດຕະຫຼາດ. ຝຶກຝົນກົນລະຍຸດຂອງທ່ານ.'
+    : 'Explore the market.<br>Practice your strategy.',
+  description: isLao
+    ? 'ຄຣິບໂຕ ແລະ ຫຸ້ນສະຫະລັດໃນບ່ອນດຽວ. ຝຶກຊື້ຂາຍດ້ວຍເງິນຈຳລອງ.'
+    : 'Crypto and US stocks in one place. Practice trading with virtual funds, without real-money orders.',
+  balance: isLao ? 'ຍອດເງິນຈຳລອງ' : 'Paper Trading Balance',
+  addFunds: isLao ? '+ ເພີ່ມເງິນຈຳລອງ $10,000' : '+ Add Funds $10,000',
+  start: isLao ? 'ເລີ່ມຊື້ຂາຍ' : 'Start Trading',
+explore: isLao ? 'ສຳຫຼວດຕະຫຼາດ' : 'Explore Markets',
+  popular: isLao ? 'ຄຣິບໂຕຍອດນິຍົມ' : 'Popular Crypto'
+};
+const fmtMoney = (value) =>
+  '$' + Number(value || 0).toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+
+const featured = ['BTC', 'ETH', 'BNB', 'SOL', 'XRP']
+
+  .map(symbol => coins.find(c => c.symbol === symbol))
+
+  .filter(Boolean);
 
 return `
     <style>
